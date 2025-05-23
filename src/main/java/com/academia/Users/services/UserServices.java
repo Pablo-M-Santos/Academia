@@ -40,15 +40,15 @@ public class UserServices {
     private UserValidation userEmailValidation;
 
 
-    public ResponseEntity<Object> create(@Valid CreateUserRequestDTO data) {
+    public ResponseEntity<StandardResponseDTO> create(@Valid CreateUserRequestDTO data) {
         userEmailValidation.validateEmail(data);
 
         String encryptedPassword = passwordEncoder.encode(data.password());
         UserModel newUser = new UserModel(data.name(), data.email(), encryptedPassword, data.role());
         userRepository.save(newUser);
 
-        StandardResponseDTO response = new StandardResponseDTO("success", "Usuário criado com sucesso");
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(new StandardResponseDTO("'success'", "Usuário criado com sucesso"));
     }
 
     public List<UserModel> findAll(String search) {
@@ -66,10 +66,10 @@ public class UserServices {
         return userRepository.findById(id);
     }
 
-    public ResponseEntity<UserResponseDTO> update(int id, @Valid UpdateUserRequestDTO updateUserRequestDTO) {
+    public ResponseEntity<StandardResponseDTO> update(int id, @Valid UpdateUserRequestDTO updateUserRequestDTO) {
         Optional<UserModel> response = userRepository.findById(id);
         if (response.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body((new StandardResponseDTO(null, "Usuário não encontrado")));
         }
 
         var userModel = response.get();
@@ -83,17 +83,18 @@ public class UserServices {
 
         userRepository.save(userModel);
         UserResponseDTO userResponseDTO = userMapper.toUserResponse(userModel);
-        return ResponseEntity.status(HttpStatus.OK).body(userResponseDTO);
+
+        return ResponseEntity.ok(new StandardResponseDTO("success","Usuário atualizado com sucesso") );
     }
 
 
-    public ResponseEntity<Object> delete(int id){
+    public ResponseEntity<StandardResponseDTO> delete(int id){
         Optional<UserModel> response = userRepository.findById(id);
         if(response.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StandardResponseDTO(null, "Usuário não encontrado"));
         }
         userRepository.delete(response.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Usuário deletado com sucesso");
+        return ResponseEntity.status(HttpStatus.OK).body(new StandardResponseDTO("success", "Usuário deletado com sucesso"));
     }
 
 }

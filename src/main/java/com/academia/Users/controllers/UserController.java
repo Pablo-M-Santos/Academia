@@ -6,6 +6,7 @@ import com.academia.Users.DTOs.UserResponseDTO;
 import com.academia.Users.mappers.UserMapper;
 import com.academia.Users.repositories.UserRepository;
 import com.academia.Users.services.UserServices;
+import com.academia.Users.shared.StandardResponseDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ public class UserController {
     UserRepository userRepository;
 
     @PostMapping("/user")
-    public ResponseEntity<Object> create(@RequestBody @Valid CreateUserRequestDTO data) {
+    public ResponseEntity<StandardResponseDTO> create(@RequestBody @Valid CreateUserRequestDTO data) {
         return userServices.create(data);
     }
 
@@ -43,13 +44,12 @@ public class UserController {
     }
 
     @PutMapping("/user/{id}")
-    public ResponseEntity<UserResponseDTO> update(@PathVariable(value="id") int id, @RequestBody @Valid UpdateUserRequestDTO updateUserRequestDTO){
+    public ResponseEntity<StandardResponseDTO> update(@PathVariable(value="id") int id, @RequestBody @Valid UpdateUserRequestDTO updateUserRequestDTO){
         return userServices.update(id, updateUserRequestDTO);
     }
 
     @DeleteMapping("/user/{id}")
-    public ResponseEntity<Object> delete(@PathVariable(value="id") int id){
+    public ResponseEntity<StandardResponseDTO> delete(@PathVariable(value="id") int id){
         return userServices.delete(id);
     }
-
 }
