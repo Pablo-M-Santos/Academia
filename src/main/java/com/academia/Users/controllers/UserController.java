@@ -28,12 +28,12 @@ public class UserController {
     UserRepository userRepository;
 
     @PostMapping("/user")
-    public ResponseEntity<Void> create(@RequestBody @Valid CreateUserRequestDTO data) {
+    public ResponseEntity<Object> create(@RequestBody @Valid CreateUserRequestDTO data) {
         return userServices.create(data);
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<UserResponseDTO>> getAll(String search){
+    public ResponseEntity<List<UserResponseDTO>> getAll(@RequestParam(required = false) String search){
         return ResponseEntity.status(HttpStatus.OK).body(userMapper.toUserResponseList(userServices.findAll(search)));
     }
 

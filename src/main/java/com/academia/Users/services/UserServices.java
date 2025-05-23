@@ -9,6 +9,7 @@ import com.academia.Users.Validation.UserValidation;
 import com.academia.Users.mappers.UserMapper;
 import com.academia.Users.models.UserModel;
 import com.academia.Users.repositories.UserRepository;
+import com.academia.Users.shared.StandardResponseDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,18 +40,19 @@ public class UserServices {
     private UserValidation userEmailValidation;
 
 
-    public ResponseEntity<Void> create(@Valid CreateUserRequestDTO data) {
+    public ResponseEntity<Object> create(@Valid CreateUserRequestDTO data) {
         userEmailValidation.validateEmail(data);
 
         String encryptedPassword = passwordEncoder.encode(data.password());
         UserModel newUser = new UserModel(data.name(), data.email(), encryptedPassword, data.role());
         userRepository.save(newUser);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        StandardResponseDTO response = new StandardResponseDTO("success", "Usuário criado com sucesso");
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     public List<UserModel> findAll(String search) {
-        if (Objects.equals(search, "")){
+        if (search == null || search.trim().isEmpty()){
             List<UserModel> users = userRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
             if (users.isEmpty()) throw new ModelNotFoundException();
             return users;
@@ -91,7 +93,7 @@ public class UserServices {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
         userRepository.delete(response.get());
-        return ResponseEntity.status(HttpStatus.OK).body("User deleted successfully");
+        return ResponseEntity.status(HttpStatus.OK).body("Usuário deletado com sucesso");
     }
 
 }
